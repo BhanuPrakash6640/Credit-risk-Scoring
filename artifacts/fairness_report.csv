@@ -1,0 +1,15 @@
+segment,group,n_loans,actual_default_rate,avg_predicted_pd,calibration_gap,approval_rate,good_approval_rate,approved_default_rate,auc,adverse_impact_ratio,passes_four_fifths
+income_band,Q2,34287,0.1572,0.1543,-0.0029,0.3308,0.3645,0.0714,0.677,0.521,False
+income_band,Q3,36416,0.1361,0.1282,-0.0079,0.4731,0.5102,0.0685,0.6912,0.745,False
+income_band,Q4 (highest),31798,0.1109,0.1015,-0.0094,0.6351,0.6672,0.0659,0.7034,1.0,True
+income_band,Q1 (lowest),34211,0.1915,0.1957,0.0042,0.1509,0.1726,0.0748,0.6521,0.238,False
+region,Midwest,24283,0.1459,0.147,0.001,0.3874,0.424,0.0652,0.6926,0.953,True
+region,Northeast,27949,0.152,0.1425,-0.0095,0.4063,0.4442,0.073,0.6825,1.0,True
+region,West,35626,0.1453,0.1457,0.0003,0.3962,0.4332,0.0655,0.695,0.975,True
+region,South,48854,0.1526,0.1462,-0.0064,0.39,0.4278,0.0703,0.6853,0.96,True
+home_ownership,MORTGAGE,62582,0.1209,0.119,-0.002,0.5226,0.5565,0.0639,0.6928,1.0,True
+home_ownership,RENT,58932,0.178,0.1716,-0.0064,0.2695,0.3026,0.077,0.6718,0.516,False
+home_ownership,OWN,15198,0.1555,0.1528,-0.0027,0.3515,0.3855,0.0739,0.6681,0.673,False
+verification_status,Source Verified,57219,0.1487,0.1474,-0.0013,0.3702,0.4043,0.0703,0.678,0.679,False
+verification_status,Verified,36619,0.1913,0.1792,-0.0121,0.2559,0.2916,0.0782,0.6708,0.469,False
+verification_status,Not Verified,42874,0.1145,0.114,-0.0005,0.5452,0.5767,0.0634,0.6877,1.0,True

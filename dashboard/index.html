@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Credit Risk Scoring Console — Institutional Underwriting</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css?v=2.1">
+  <!-- Bundled local Chart.js for offline functionality -->
+  <script src="/static/vendor/chart.umd.min.js"></script>
+</head>
+<body data-theme="light">
+
+  <!-- TOP HEADER -->
+  <header class="app-header">
+    <div class="brand-title">
+      <span style="font-size: 22px;">🛡️</span>
+      <span>Credit Risk Scoring Console</span>
+      <span class="badge-champion">
+        <span style="display:inline-block; width:7px; height:7px; background:#2563EB; border-radius:50%;"></span>
+        <span id="championLabel">Champion: loading…</span>
+      </span>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+      <a href="/api/template" class="btn btn-secondary">
+        <span>↓</span> Download CSV Template
+      </a>
+      <button class="btn btn-secondary" onclick="toggleTheme()" id="themeToggleBtn">
+        <span id="themeIcon">🌙</span> Mode
+      </button>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- START SCREEN (CLEAN UPLOAD HERO CARD) -->
+    <div class="hero-card" id="uploadSection">
+      <h1 class="hero-title">Institutional Credit Risk Underwriting Console</h1>
+      <p class="hero-desc">
+        Upload loan applicants in raw banking application format for real-time automated scoring,
+        calibrated Probability of Default (PD), credit score generation (300–850), Basel expected loss calculation,
+        and plain-English Adverse Action SHAP reason codes.
+      </p>
+
+      <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <input type="file" id="fileInput" accept=".csv" style="display:none;" onchange="handleFileSelected(event)">
+        <div class="upload-icon">📂</div>
+        <div class="upload-prompt">Drag & drop an applicant CSV here, or click to browse</div>
+        <div class="upload-sub">Supports single or multi-applicant batches up to 5MB · Strictly 36-month loan cohorts · Zero PII disk logging</div>
+      </div>
+
+      <div class="loader" id="scoringLoader"></div>
+      <div id="uploadError" style="display:none; color:#DC2626; font-weight:600; margin-top:16px; font-size:13.5px;"></div>
+
+      <div class="hero-actions">
+        <button class="btn btn-primary" onclick="scoreDemoBatch()" id="btnDemo300">
+          <span>🚀</span> Demo Batch (300 Applicants)
+        </button>
+        <button class="btn btn-secondary" onclick="scoreSampleApplicants()" id="btnExample5">
+          <span>⚡</span> Example File (5 Applicants)
+        </button>
+        <button class="btn btn-secondary" onclick="scoreMixedBatch()" id="btnDemoMixed" title="Demonstrates partial acceptance: valid rows scored, 2 invalid rows gracefully isolated into audit list">
+          <span>🛡️</span> Demo Partial Acceptance (Mixed Data)
+        </button>
+        <button class="btn btn-secondary" onclick="scoreIneligibleBatch()" id="btnDemoIneligible" title="Demonstrates policy gate: 60-month loans safely flagged as ineligible and not scored">
+          <span>⚠️</span> Demo Policy Gate (60m Terms)
+        </button>
+        <a href="/api/template" class="btn btn-secondary">
+          <span>↓</span> Download CSV Template
+        </a>
+      </div>
+    </div>
+
+    <!-- RESULTS SECTION (Shown After Scoring) -->
+    <div id="resultsSection">
+
+      <!-- Notice / Warning Banner -->
+      <div id="globalWarningBanner" class="banner-warning" style="display:none;">
+        <span>⚠️</span>
+        <span id="globalWarningText"></span>
+      </div>
+
+      <!-- Header Bar with Batch Actions -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+        <div>
+          <h2 style="font-size:22px; font-weight:800; color:var(--text-primary); letter-spacing:-0.02em;">
+            Portfolio Underwriting Overview
+          </h2>
+          <div style="font-size:13px; color:var(--text-tertiary); margin-top:3px;">
+            Dual-cutoff decision protocol: <strong style="color:var(--color-approve);">Approve (PD ≤ 10%)</strong> · <strong style="color:var(--color-review);">Review (10%–20%)</strong> · <strong style="color:var(--color-decline);">Decline (PD > 20%)</strong>
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <button class="btn btn-secondary" onclick="exportResultsCSV()">
+            <span>↓</span> Export Scored CSV
+          </button>
+          <button class="btn btn-secondary" onclick="scoreMixedBatch()" title="Demonstrates partial acceptance: valid rows scored, invalid rows isolated in audit list">
+            <span>🛡️</span> Demo Partial Acceptance
+          </button>
+          <button class="btn btn-primary" onclick="resetToUpload()">
+            <span>+</span> Upload Batch
+          </button>
+        </div>
+      </div>
+
+      <!-- EXECUTIVE 6-KPI CARDS -->
+      <div class="metrics-grid-6">
+        <div class="kpi-card">
+          <div class="kpi-label">Applicants Scored</div>
+          <div class="kpi-val" id="metricTotal">0</div>
+          <div class="kpi-sub" id="metricDecisionsSub">Eligible 36-month loans</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Auto-Approval Rate</div>
+          <div class="kpi-val" id="metricApprovalRate">0.0%</div>
+          <div class="kpi-sub" id="metricApprovalSub">0 auto-approved</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Average Calibrated PD</div>
+          <div class="kpi-val" id="metricAvgPd">0.0%</div>
+          <div class="kpi-sub" id="metricCutoffSub">Benchmark prior: 14.6%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Total Loan Exposure</div>
+          <div class="kpi-val" id="metricExposure">$0</div>
+          <div class="kpi-sub" id="metricExposureSub">Avg: $0 / applicant</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Total Expected Loss</div>
+          <div class="kpi-val" id="metricEl">$0</div>
+          <div class="kpi-sub" id="metricElSub">Basel LGD 60% standard</div>
+        </div>
+        <div class="kpi-card" style="border-left: 3px solid var(--color-ineligible);">
+          <div class="kpi-label">Ineligible (60-Month)</div>
+          <div class="kpi-val" id="metricIneligible">0</div>
+          <div class="kpi-sub" style="color:var(--color-ineligible);">Policy gate: Not scored</div>
+        </div>
+      </div>
+
+      <!-- PORTFOLIO CHARTS (2x2 GRID) -->
+      <div class="portfolio-charts-grid">
+        <!-- Chart 1: Donut Decision Distribution -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">Underwriting Decision Distribution</div>
+              <div class="chart-subtitle">Approve, Review, Decline & Ineligible breakdown</div>
+            </div>
+          </div>
+          <div class="chart-canvas-wrapper">
+            <canvas id="decisionDonutChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: PD Distribution Histogram with Shaded Zones -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">Probability of Default (PD) Distribution</div>
+              <div class="chart-subtitle">Batch frequency with Low (≤10%), Med (10-20%), High (>20%) cutoffs</div>
+            </div>
+          </div>
+          <div class="chart-canvas-wrapper">
+            <canvas id="pdHistogramChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 3: Exposure vs Expected Loss Bar Chart -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">Exposure & Expected Loss by Risk Band</div>
+              <div class="chart-subtitle">Capital allocation and downside risk per credit tier</div>
+            </div>
+          </div>
+          <div class="chart-canvas-wrapper">
+            <canvas id="exposureElChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 4: Credit Score Distribution -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <div>
+              <div class="chart-title">Scorecard Credit Score Distribution</div>
+              <div class="chart-subtitle">Applicant count across 300–850 scorecard tiers</div>
+            </div>
+          </div>
+          <div class="chart-canvas-wrapper">
+            <canvas id="scoreDistributionChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABLE CONTROLS BAR -->
+      <div class="table-controls-bar">
+        <div class="controls-left">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="tableSearchInput" placeholder="Search by Applicant #..." oninput="handleTableSearch(event)">
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-label">Decision:</span>
+            <button class="pill-btn active" data-filter="decision" data-val="ALL" onclick="setDecisionFilter('ALL')">All</button>
+            <button class="pill-btn" data-filter="decision" data-val="APPROVE" onclick="setDecisionFilter('APPROVE')">Approve</button>
+            <button class="pill-btn" data-filter="decision" data-val="REVIEW" onclick="setDecisionFilter('REVIEW')">Review</button>
+            <button class="pill-btn" data-filter="decision" data-val="DECLINE" onclick="setDecisionFilter('DECLINE')">Decline</button>
+            <button class="pill-btn" data-filter="decision" data-val="INELIGIBLE" onclick="setDecisionFilter('INELIGIBLE')">Ineligible</button>
+          </div>
+
+          <div class="filter-group">
+            <span class="filter-label">Band:</span>
+            <button class="pill-btn active" data-filter="band" data-val="ALL" onclick="setBandFilter('ALL')">All</button>
+            <button class="pill-btn" data-filter="band" data-val="Low Risk" onclick="setBandFilter('Low Risk')">Low</button>
+            <button class="pill-btn" data-filter="band" data-val="Medium Risk" onclick="setBandFilter('Medium Risk')">Medium</button>
+            <button class="pill-btn" data-filter="band" data-val="High Risk" onclick="setBandFilter('High Risk')">High</button>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:12px; color:var(--text-tertiary);">Rows per page:</span>
+          <select id="pageSizeSelect" style="padding:5px 8px; border-radius:var(--radius-sm); border:1px solid var(--border-medium); background:var(--bg-app); color:var(--text-primary); font-size:12px;" onchange="changePageSize(event)">
+            <option value="10">10</option>
+            <option value="25" selected>25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- APPLICANT UNDERWRITING TABLE -->
+      <div class="table-container">
+        <table class="app-table">
+          <thead>
+            <tr>
+              <th onclick="sortTable('id')"># <span class="sort-arrow" id="sort_id">↕</span></th>
+              <th onclick="sortTable('loan_amnt')">Loan Amount <span class="sort-arrow" id="sort_loan_amnt">↕</span></th>
+              <th>Term</th>
+              <th onclick="sortTable('annual_inc')">Annual Income <span class="sort-arrow" id="sort_annual_inc">↕</span></th>
+              <th onclick="sortTable('fico')">FICO Score <span class="sort-arrow" id="sort_fico">↕</span></th>
+              <th onclick="sortTable('dti')">DTI Ratio <span class="sort-arrow" id="sort_dti">↕</span></th>
+              <th onclick="sortTable('default_probability')">Prob. of Default <span class="sort-arrow" id="sort_default_probability">↕</span></th>
+              <th onclick="sortTable('credit_score')">Credit Score <span class="sort-arrow" id="sort_credit_score">↕</span></th>
+              <th>Risk Band</th>
+              <th onclick="sortTable('expected_loss')">Expected Loss <span class="sort-arrow" id="sort_expected_loss">↕</span></th>
+              <th>Decision</th>
+              <th style="text-align:right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="applicantTableBody">
+            <!-- Dynamically populated rows -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PAGINATION BAR -->
+      <div class="pagination-bar">
+        <div id="paginationInfo">Showing 0 to 0 of 0 applicants</div>
+        <div class="pagination-controls">
+          <button class="page-btn" id="prevPageBtn" onclick="prevPage()">← Previous</button>
+          <span id="pageNumbersSpan" style="font-weight:600; padding:0 6px;">Page 1</span>
+          <button class="page-btn" id="nextPageBtn" onclick="nextPage()">Next →</button>
+        </div>
+      </div>
+
+      <!-- COULD NOT SCORE (INVALID ROWS) SECTION -->
+      <div id="couldNotScoreSection" style="display:none; margin-top:28px; background:var(--bg-card); border:1px solid #FECACA; border-radius:var(--radius-lg); padding:20px 24px; box-shadow:var(--shadow-sm);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:18px;">⚠️</span>
+            <h3 style="font-size:16px; font-weight:800; color:#DC2626; margin:0;" id="couldNotScoreTitle">
+              Could Not Score (0 Records)
+            </h3>
+          </div>
+          <span style="font-size:12.5px; color:var(--text-tertiary);">
+            These records contained invalid data types or out-of-bounds attributes and were excluded from underwriting.
+          </span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="app-table" style="margin-top:8px;">
+            <thead>
+              <tr style="background:rgba(239,68,68,0.06);">
+                <th style="width:80px;">CSV Row</th>
+                <th>Validation Issue</th>
+                <th>Loan Amount</th>
+                <th>Annual Income</th>
+                <th>DTI Ratio</th>
+                <th>FICO Score</th>
+                <th>Purpose</th>
+              </tr>
+            </thead>
+            <tbody id="couldNotScoreTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- APPLICANT DETAIL MODAL (EXPERT DOSSIER) -->
+  <div class="modal-overlay" id="applicantModal" onclick="closeModal(event)">
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+
+      <!-- Modal Header -->
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; padding-bottom:16px; border-bottom:1px solid var(--border-light); margin-bottom:16px; gap:16px;">
+        <div>
+          <h2 style="font-size:22px; font-weight:800; color:var(--text-primary); letter-spacing:-0.02em;" id="modalApplicantTitle">
+            Applicant #1 Dossier
+          </h2>
+          <div style="font-size:13px; color:var(--text-tertiary); margin-top:4px;" id="modalApplicantSub">
+            36 months · Debt Consolidation
+          </div>
+        </div>
+        <div id="modalDecisionBadge" style="margin-right:36px;"></div>
+      </div>
+
+      <!-- Applicant Top KPI Cards -->
+      <div class="applicant-kpis">
+        <div class="app-kpi-card">
+          <div class="app-kpi-label">Loan Amount</div>
+          <div class="app-kpi-val" id="modalLoanAmnt">$0</div>
+        </div>
+        <div class="app-kpi-card">
+          <div class="app-kpi-label">Default Probability (PD)</div>
+          <div class="app-kpi-val" id="modalPd">0.0%</div>
+        </div>
+        <div class="app-kpi-card">
+          <div class="app-kpi-label">Scorecard (300–850)</div>
+          <div class="app-kpi-val" id="modalScore">-</div>
+        </div>
+        <div class="app-kpi-card">
+          <div class="app-kpi-label">Basel Expected Loss</div>
+          <div class="app-kpi-val" id="modalEl">$0</div>
+        </div>
+      </div>
+
+      <!-- Decision Rationale Box -->
+      <div style="background:var(--bg-app); border:1px solid var(--border-light); border-radius:var(--radius-md); padding:14px 18px; margin-bottom:20px;">
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-tertiary); margin-bottom:4px;">
+          Underwriting Recommendation & Policy Guidance
+        </div>
+        <div style="font-size:13.5px; font-weight:500; color:var(--text-primary);" id="modalRationale"></div>
+        <div id="modalWarning" style="color:var(--color-decline); font-size:12px; font-weight:600; margin-top:6px; display:none;"></div>
+        
+        <!-- Note on automatically filled-in / imputed values (Point 2) -->
+        <div id="modalImputedNote" style="margin-top:10px; padding:10px 14px; background:rgba(37,99,235,0.08); border-left:3px solid #2563EB; border-radius:4px; font-size:12.5px; color:var(--text-primary); display:none;">
+          <div style="font-weight:700; color:#1D4ED8; margin-bottom:2px;">ℹ️ Automated Attribute Imputation</div>
+          <div id="modalImputedFieldsText" style="color:var(--text-secondary); line-height:1.4;"></div>
+        </div>
+      </div>
+
+      <!-- Row 1: Semicircle Score Gauge & Population Benchmark Bars -->
+      <div class="dossier-grid-2">
+        <!-- Credit Score Semicircle Gauge -->
+        <div class="dossier-card">
+          <div class="dossier-card-title">
+            <span>Scorecard Calibration (300–850)</span>
+            <span id="modalBandBadge" class="badge-band"></span>
+          </div>
+          <div style="position:relative; height:180px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <canvas id="scoreGaugeCanvas" width="280" height="150"></canvas>
+            <div id="gaugeScoreNumber" style="font-size:26px; font-weight:800; font-family:var(--font-mono); margin-top:-20px; color:var(--text-primary);">
+              -
+            </div>
+            <div id="gaugeScoreLabel" style="font-size:11.5px; color:var(--text-tertiary);">
+              PDO Anchor: 660 @ 20% Base Odds
+            </div>
+          </div>
+        </div>
+
+        <!-- Underwriting Comparison Bars vs Benchmark -->
+        <div class="dossier-card">
+          <div class="dossier-card-title">
+            <span>Applicant vs. Portfolio Benchmark</span>
+            <span style="font-size:11px; font-weight:500; color:var(--text-tertiary);">Median Base</span>
+          </div>
+          <div id="benchmarkComparisonList">
+            <!-- Populated dynamically by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: SHAP Waterfall Risk Decomposition & Adverse Action Codes -->
+      <div class="dossier-grid-2">
+        <!-- SHAP Waterfall Decomposition -->
+        <div class="dossier-card">
+          <div class="dossier-card-title">
+            <span>SHAP Risk Driver Decomposition</span>
+            <span style="font-size:11px; font-weight:500; color:var(--text-tertiary);">Base PD → Applicant PD</span>
+          </div>
+          <div class="waterfall-container" id="shapWaterfallContainer">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Plain-English Adverse Action Reason Codes -->
+        <div class="dossier-card">
+          <div class="dossier-card-title">
+            <span>Adverse Action Reason Codes</span>
+            <span style="font-size:11px; font-weight:500; color:var(--text-tertiary);">FCRA Statutory Notice</span>
+          </div>
+          <div id="modalReasonCodesList" style="display:flex; flex-direction:column; gap:8px;">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 3: Stated Application Attributes -->
+      <div class="dossier-card" style="margin-bottom:0;">
+        <div class="dossier-card-title">
+          <span>Stated Application & Credit Bureau Attributes</span>
+        </div>
+        <div class="attributes-grid" id="modalRawFeaturesGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="/static/app.js?v=2.1"></script>
+</body>
+</html>

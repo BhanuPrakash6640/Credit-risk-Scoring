@@ -1,0 +1,13 @@
+*
+!requirements.txt
+!config.py
+!app.py
+!src/
+!dashboard/
+!artifacts/best_model.joblib
+!artifacts/underwriting_benchmarks.json
+!data/demo_batch_300.csv
+!data/example_applicants.csv
+!data/template_applicants.csv
+!data/test_files/
+**/__pycache__

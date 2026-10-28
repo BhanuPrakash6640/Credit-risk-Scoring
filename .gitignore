@@ -1,0 +1,33 @@
+# Raw dataset (1.6 GB) and anything regenerable from it
+data/*.csv
+data/*.csv.gz
+data/*.gz
+data/*.zip
+data/*.parquet
+data/external/
+!data/.gitkeep
+# Small demo / test inputs used by the API, tests and Docker image
+!data/demo_batch_300.csv
+!data/example_applicants.csv
+!data/template_applicants.csv
+
+# Model artifacts: the champion bundle is committed (small, needed by the API,
+# tests and Docker). Large regenerable outputs are not.
+artifacts/*.joblib
+!artifacts/best_model.joblib
+artifacts/scored_sample.csv
+
+logs/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+env/
+.DS_Store
+.vscode/
+.idea/
+
+.claude/

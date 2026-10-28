@@ -1,0 +1,63 @@
+{
+  "run": "python run_pipeline.py --with-lc-signals --skip-save",
+  "added_features": [
+    "grade",
+    "int_rate",
+    "installment",
+    "installment_to_loan",
+    "installment_to_monthly_income",
+    "dti_x_int_rate"
+  ],
+  "champion": "LightGBM",
+  "test_window": "2015-04 to 2015-09",
+  "models": {
+    "Soft-Voting Ensemble": {
+      "roc_auc": 0.7038,
+      "ci": [
+        0.7003,
+        0.7076
+      ],
+      "ks": 0.2977
+    },
+    "LightGBM": {
+      "roc_auc": 0.7031,
+      "ci": [
+        0.6994,
+        0.7068
+      ],
+      "ks": 0.2993
+    },
+    "CatBoost": {
+      "roc_auc": 0.7029,
+      "ci": [
+        0.6993,
+        0.7067
+      ],
+      "ks": 0.2955
+    },
+    "XGBoost": {
+      "roc_auc": 0.7028,
+      "ci": [
+        0.6991,
+        0.7066
+      ],
+      "ks": 0.2955
+    },
+    "Logistic Regression": {
+      "roc_auc": 0.6978,
+      "ci": [
+        0.6942,
+        0.7016
+      ],
+      "ks": 0.2903
+    },
+    "Random Forest": {
+      "roc_auc": 0.6976,
+      "ci": [
+        0.694,
+        0.7014
+      ],
+      "ks": 0.2923
+    }
+  }
+}

@@ -1,0 +1,26 @@
+loan_amnt,term,emp_length,home_ownership,annual_inc,verification_status,purpose,dti,delinq_2yrs,earliest_cr_line,issue_d,fico_range_low,fico_range_high,inq_last_6mths,open_acc,pub_rec,revol_bal,revol_util,total_acc,initial_list_status,application_type,mort_acc,pub_rec_bankruptcies,tot_cur_bal,tot_hi_cred_lim,bc_util,percent_bc_gt_75,acc_open_past_24mths
+5000.0,36 months,< 1 year,MORTGAGE,150000.0,Verified,other,8.5,2.0,Nov-1993,Dec-2015,670.0,674.0,0.0,10.0,0.0,4962.0,48.6,27.0,w,Individual,0.0,0.0,91397.0,100028.0,47.1,33.3,6.0
+22000.0,36 months,< 1 year,RENT,90000.0,Source Verified,debt_consolidation,17.59,1.0,Jan-1994,Dec-2015,710.0,714.0,0.0,12.0,0.0,20108.0,54.8,26.0,w,Individual,2.0,0.0,106991.0,213739.0,48.3,0.0,1.0
+14000.0,36 months,6 years,OWN,70000.0,Not Verified,home_improvement,31.1,0.0,Dec-1998,Dec-2015,735.0,739.0,0.0,12.0,0.0,15698.0,41.3,20.0,w,Individual,,,47794.0,97539.0,45.4,0.0,3.0
+8000.0,36 months,3 years,RENT,46000.0,Source Verified,debt_consolidation,8.87,1.0,Jun-2009,Dec-2015,675.0,679.0,0.0,12.0,0.0,2221.0,18.5,24.0,w,Individual,3.0,0.0,129163.0,153617.0,21.0,25.0,6.0
+20000.0,36 months,6 years,MORTGAGE,56000.0,Not Verified,debt_consolidation,22.4,0.0,May-2000,Dec-2015,690.0,694.0,0.0,6.0,0.0,6365.0,46.8,29.0,w,Individual,6.0,0.0,202156.0,245284.0,47.9,0.0,4.0
+ERR_AMOUNT_9999,36 months,3 years,OWN,150000.0,Verified,credit_card,19.34,1.0,Sep-2003,Dec-2015,695.0,699.0,0.0,14.0,0.0,19149.0,81.5,49.0,w,Individual,4.0,0.0,476537.0,528432.0,101.9,100.0,3.0
+6000.0,36 months,1 year,OWN,50000.0,Not Verified,credit_card,18.96,0.0,Oct-2006,Dec-2015,695.0,699.0,0.0,10.0,0.0,5320.0,32.8,18.0,w,Individual,0.0,0.0,44887.0,56832.0,42.2,25.0,9.0
+8000.0,36 months,10+ years,OWN,40000.0,Not Verified,debt_consolidation,21.66,0.0,Apr-2001,Dec-2015,675.0,679.0,3.0,11.0,4.0,5457.0,38.2,20.0,w,Individual,0.0,1.0,24991.0,43651.0,47.3,0.0,7.0
+10000.0,36 months,10+ years,MORTGAGE,65000.0,Source Verified,debt_consolidation,14.73,0.0,Dec-2003,Dec-2015,670.0,674.0,0.0,11.0,1.0,8358.0,48.3,22.0,w,Individual,1.0,1.0,31312.0,43585.0,82.0,50.0,6.0
+15000.0,36 months,6 years,MORTGAGE,66248.0,Verified,debt_consolidation,31.67,0.0,Mar-1993,Dec-2015,680.0,684.0,0.0,14.0,0.0,71553.0,87.0,26.0,w,Individual,6.0,0.0,185509.0,226117.0,,100.0,4.0
+30000.0,36 months,10+ years,MORTGAGE,107111.0,Source Verified,debt_consolidation,13.09,0.0,Mar-1999,Dec-2015,765.0,769.0,0.0,11.0,0.0,43779.0,56.0,18.0,f,Individual,1.0,0.0,112683.0,210881.0,62.5,0.0,5.0
+6400.0,36 months,1 year,RENT,40000.0,Source Verified,credit_card,5.01,0.0,Mar-2007,Dec-2015,685.0,689.0,0.0,8.0,0.0,3689.0,38.4,12.0,w,Individual,0.0,0.0,3689.0,9600.0,41.4,14.3,4.0
+20000.0,36 months,10+ years,MORTGAGE,78000.0,Not Verified,debt_consolidation,27.1,0.0,Dec-1999,Dec-2015,705.0,709.0,0.0,15.0,0.0,40405.0,48.2,37.0,w,Individual,6.0,0.0,290569.0,346262.0,56.3,50.0,6.0
+12500.0,36 months,10+ years,MORTGAGE,34000.0,Verified,debt_consolidation,27.11,0.0,Oct-1998,Dec-2015,685.0,689.0,0.0,14.0,0.0,28554.0,66.3,30.0,w,Individual,5.0,0.0,28554.0,43100.0,81.0,66.7,4.0
+12000.0,36 months,10+ years,MORTGAGE,88000.0,Source Verified,debt_consolidation,14.01,4.0,Sep-2003,Dec-2015,685.0,689.0,1.0,11.0,0.0,14241.0,65.3,24.0,w,Individual,4.0,0.0,359451.0,420617.0,38.8,0.0,1.0
+13150.0,36 months,1 year,RENT,-75000.0,Not Verified,major_purchase,20.25,0.0,May-2001,Dec-2015,765.0,769.0,0.0,13.0,0.0,11221.0,20.1,17.0,w,Individual,0.0,0.0,29071.0,83916.0,16.8,0.0,2.0
+15000.0,36 months,10+ years,RENT,48000.0,Source Verified,car,12.2,0.0,Feb-1990,Dec-2015,680.0,684.0,0.0,10.0,1.0,8588.0,60.1,11.0,w,Individual,0.0,1.0,15450.0,22300.0,79.1,25.0,1.0
+8000.0,36 months,5 years,MORTGAGE,53000.0,Verified,debt_consolidation,20.13,0.0,Dec-2000,Dec-2015,670.0,674.0,1.0,9.0,1.0,6515.0,50.9,18.0,w,Individual,1.0,1.0,112452.0,129279.0,69.0,0.0,8.0
+25000.0,36 months,10+ years,RENT,185000.0,Not Verified,debt_consolidation,14.03,0.0,Sep-2002,Dec-2015,705.0,709.0,2.0,10.0,0.0,26265.0,46.8,24.0,w,Individual,0.0,0.0,77229.0,149751.0,50.0,16.7,3.0
+11000.0,36 months,< 1 year,MORTGAGE,37000.0,Not Verified,debt_consolidation,10.9,0.0,Jan-2009,Dec-2015,700.0,704.0,2.0,4.0,0.0,13276.0,55.8,10.0,w,Individual,2.0,0.0,13276.0,23800.0,59.3,0.0,2.0
+15000.0,36 months,4 years,MORTGAGE,85000.0,Not Verified,debt_consolidation,13.56,1.0,Nov-1994,Dec-2015,745.0,749.0,0.0,12.0,0.0,18084.0,46.3,21.0,w,Individual,1.0,0.0,140059.0,189694.0,49.8,0.0,2.0
+18000.0,36 months,2 years,MORTGAGE,63000.0,Not Verified,debt_consolidation,18.04,0.0,Apr-2001,Dec-2015,730.0,734.0,0.0,7.0,0.0,65176.0,24.6,15.0,w,Individual,2.0,0.0,77606.0,159379.0,32.6,0.0,1.0
+5000.0,36 months,< 1 year,RENT,47000.0,Source Verified,debt_consolidation,38.61,0.0,Apr-2003,Dec-2015,680.0,684.0,0.0,17.0,0.0,10099.0,54.9,35.0,w,Individual,0.0,0.0,86424.0,109937.0,85.9,100.0,5.0
+22500.0,36 months,10+ years,OWN,114000.0,Source Verified,debt_consolidation,9.83,2.0,Sep-1992,Dec-2015,665.0,669.0,2.0,15.0,0.0,20164.0,56.8,38.0,w,Individual,6.0,0.0,84655.0,102164.0,53.6,40.0,14.0
+8000.0,36 months,10+ years,MORTGAGE,45000.0,Verified,credit_card,34.47,0.0,Sep-2004,Dec-2015,675.0,679.0,0.0,18.0,0.0,13717.0,60.4,39.0,w,Individual,3.0,0.0,198334.0,225548.0,72.5,42.9,9.0
