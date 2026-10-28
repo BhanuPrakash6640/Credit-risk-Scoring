@@ -7,6 +7,9 @@ For each applicant it returns a calibrated PD, a 300–850 scorecard number, a r
 decision (approve / review / decline), the expected loss, and the top four reasons behind
 the score.
 
+**Live demo: [credit-risk-scoring-i1im.onrender.com](https://credit-risk-scoring-i1im.onrender.com/)**
+(free hosting, so the first visit after a quiet spell takes about a minute to wake up)
+
 ![Portfolio overview](docs/screenshots/02_portfolio_overview.png)
 
 ## Results
