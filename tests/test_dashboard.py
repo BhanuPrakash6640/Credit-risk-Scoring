@@ -215,7 +215,22 @@ def test_partial_acceptance_mixed_good_bad():
 
     # Global warning should alert user about unscorable rows
     assert data.get("global_warning") is not None
-    assert "2 row(s) failed validation and could not be scored" in data["global_warning"]
+    assert "2 rows failed validation and could not be scored" in data["global_warning"]
+
+
+def test_optional_model_column_can_be_missing():
+    """A CSV without percent_bc_gt_75 (not a required column) still scores."""
+    csv_path = ROOT / "data" / "example_applicants.csv"
+    import pandas as pd
+
+    df = pd.read_csv(csv_path)
+    df = df.drop(columns=[c for c in ["percent_bc_gt_75"] if c in df.columns])
+    response = client.post(
+        "/api/score",
+        files={"file": ("no_optional.csv", io.BytesIO(df.to_csv(index=False).encode()), "text/csv")},
+    )
+    assert response.status_code == 200, response.text
+    assert response.json()["summary"]["eligible_count"] >= 1
 
 
 def test_filled_in_values_tracking():

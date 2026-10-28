@@ -145,6 +145,10 @@ if DASHBOARD_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(DASHBOARD_DIR)), name="static")
 
 
+def _plural(n: int, word: str) -> str:
+    return f"{n} {word}{'' if n == 1 else 's'}"
+
+
 @app.get("/", response_class=HTMLResponse)
 async def serve_index():
     index_file = DASHBOARD_DIR / "index.html"
@@ -299,19 +303,21 @@ async def score_applicants(file: UploadFile = File(...)):
     if has_60m_loans:
         n_60m = int((parsed_term == 60).sum())
         notice_parts.append(
-            f"{n_60m} applicant(s) requested a 60-month term (ineligible under policy, not scored)"
+            f"{_plural(n_60m, 'applicant')} asked for a 60-month term, so {'it was' if n_60m == 1 else 'they were'} not scored (only 36-month loans are)"
         )
     if invalid_rows:
         notice_parts.append(
-            f"{len(invalid_rows)} row(s) failed validation and could not be scored (see Could Not Score list below)"
+            f"{_plural(len(invalid_rows), 'row')} failed validation and could not be scored (see Input issues)"
         )
-    global_warning = ("Notice: " + "; ".join(notice_parts) + ".") if notice_parts else None
+    global_warning = ("; ".join(notice_parts) + ".").capitalize() if notice_parts else None
 
     # 5. Reuse exact cleaning & feature engineering pipelines
     try:
         df_clean, _ = cleaning.clean(df_scoring, verbose=False, is_training=False)
         df_feat = features.build_features(df_clean, verbose=False)
-        X = df_feat[numeric_features + categorical_features]
+        # Optional columns the upload left out are scored as missing: the
+        # pipeline imputes them with training medians instead of erroring.
+        X = df_feat.reindex(columns=numeric_features + categorical_features)
     except Exception as e:
         raise HTTPException(
             status_code=500,
